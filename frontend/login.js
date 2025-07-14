@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const password = passwordInput.value;
 
         try {
-            const res = await fetch('http://localhost:3000/api/login', {
+            const res = await fetch('https://memoapp-backend.onrender.com', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
