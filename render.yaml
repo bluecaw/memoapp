@@ -1,0 +1,7 @@
+services:
+  - type: static_site
+    name: memoapp-frontend # あなたのRender上のStatic Siteの名前に合わせてください
+    headers:
+      - path: "/*"
+        name: "Content-Security-Policy"
+        value: "default-src 'self'; connect-src 'self' https://memoapp-backend.onrender.com;"
