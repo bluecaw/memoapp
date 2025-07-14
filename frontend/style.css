@@ -1,0 +1,248 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap');
+
+:root {
+    --primary-color: #8a2be2; /* BlueViolet */
+    --primary-hover-color: #7b24cb;
+    --background-color: #f4f0f8;
+    --card-bg-color: #ffffff;
+    --text-color: #333;
+    --header-color: #4c2a85;
+    --border-color: #ddd;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --delete-color: #e74c3c;
+    --delete-hover-color: #c0392b;
+    --edit-color: #f39c12;
+    --edit-hover-color: #e67e22;
+}
+
+body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 2rem;
+}
+
+h1 {
+    text-align: center;
+    color: var(--header-color);
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+#memo-form {
+    max-width: 600px;
+    margin: 2rem auto;
+    background: var(--card-bg-color);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px var(--shadow-color);
+}
+
+#memo-content {
+    width: 100%;
+    box-sizing: border-box;
+    height: 120px;
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    font-family: 'Noto Sans JP', sans-serif;
+    resize: vertical;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+#memo-content:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 8px rgba(138, 43, 226, 0.3);
+}
+
+#memo-form button {
+    display: block;
+    width: 100%;
+    padding: 0.8rem;
+    background: linear-gradient(45deg, var(--primary-color), #9b59b6);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: 700;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+#memo-form button:hover {
+    background: linear-gradient(45deg, var(--primary-hover-color), #8e44ad);
+    transform: translateY(-2px);
+}
+
+#memo-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    max-width: 1200px;
+    margin: 2rem auto;
+}
+
+.memo-item {
+    background-color: var(--card-bg-color);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px var(--shadow-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1.5rem;
+    border-left: 5px solid var(--primary-color);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.memo-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    animation: rainbow-border 4s linear infinite;
+}
+
+.memo-item p {
+    margin: 0 0 1rem 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    flex-grow: 1;
+}
+
+.memo-actions {
+    text-align: right;
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+.memo-actions button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    color: white;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease;
+}
+
+.edit-btn {
+    background-color: var(--edit-color);
+}
+
+.edit-btn:hover {
+    background-color: var(--edit-hover-color);
+}
+
+.delete-btn {
+    background-color: var(--delete-color);
+}
+
+.delete-btn:hover {
+    background-color: var(--delete-hover-color);
+}
+
+@keyframes rainbow-border {
+    0%, 100% { border-left-color: #ff2400; } /* Red */
+    14% { border-left-color: #ff7f00; } /* Orange */
+    28% { border-left-color: #ffff00; } /* Yellow */
+    42% { border-left-color: #00ff00; } /* Green */
+    57% { border-left-color: #0000ff; } /* Blue */
+    71% { border-left-color: #4b0082; } /* Indigo */
+    85% { border-left-color: #9400d3; } /* Violet */
+}
+
+/* Auth Container */
+.auth-container {
+    max-width: 400px;
+    margin: 4rem auto;
+    padding: 2rem;
+    background: var(--card-bg-color);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px var(--shadow-color);
+    text-align: center;
+}
+
+.auth-container h1 {
+    margin-bottom: 1.5rem;
+}
+
+.auth-container form input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.auth-container form button {
+    width: 100%;
+    padding: 0.8rem;
+    background: linear-gradient(45deg, var(--primary-color), #9b59b6);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: background 0.3s ease;
+}
+
+.auth-container form button:hover {
+    background: linear-gradient(45deg, var(--primary-hover-color), #8e44ad);
+}
+
+.auth-container p {
+    margin-top: 1.5rem;
+}
+
+/* Header Container */
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto 2rem auto;
+}
+
+#logout-btn {
+    padding: 0.6rem 1.2rem;
+    background-color: var(--edit-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+}
+
+#logout-btn:hover {
+    background-color: var(--edit-hover-color);
+}
+
+/* Notification Styles */
+#notification {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--header-color);
+    color: white;
+    padding: 12px 25px;
+    border-radius: 25px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    font-size: 1rem;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s, visibility 0.5s, transform 0.5s;
+}
+
+#notification.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -10px);
+}

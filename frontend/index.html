@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' http://localhost:3000; img-src 'self' data:; object-src 'none'; frame-ancestors 'none';">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>メモアプリ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header-container">
+        <h1>メモアプリ</h1>
+        <button id="logout-btn">ログアウト</button>
+    </div>
+    <form id="memo-form">
+        <input type="hidden" id="memo-id">
+        <textarea id="memo-content" placeholder="新しいメモを入力..." required></textarea>
+        <button type="submit">保存</button>
+    </form>
+    <div id="memo-list"></div>
+
+    <div id="notification" class="hidden">保存しました</div>
+
+    <script src="script.js"></script>
+</body>
+</html>

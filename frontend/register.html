@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ユーザー登録 - メモアプリ</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="auth-container">
+        <h1>ユーザー登録</h1>
+        <form id="register-form">
+            <input type="text" id="username" placeholder="ユーザー名" required>
+            <input type="password" id="password" placeholder="パスワード" required>
+            <button type="submit">登録</button>
+        </form>
+        <p>すでにアカウントをお持ちですか？ <a href="login.html">ログインはこちら</a></p>
+    </div>
+    <div id="notification" class="hidden"></div>
+    <script src="register.js"></script>
+</body>
+</html>

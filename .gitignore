@@ -1,0 +1,6 @@
+# Dependencies
+/node_modules
+
+# Backend
+/backend/database.db
+/backend/.env
