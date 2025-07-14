@@ -1,4 +1,5 @@
 const express = require('express');
+require('dotenv').config(); // .envファイルを読み込む
 const sqlite3 = require('sqlite3').verbose();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
