@@ -16,7 +16,7 @@ if (!JWT_SECRET) {
 
 // CORS設定
 const corsOptions = {
-  origin: ['http://localhost:5500', 'http://127.0.0.1:5500', 'https://your-frontend-name.onrender.com'], // 自分のフロントエンドURLに後で変更
+  origin: ['http://localhost:5500', 'https://memoapp-frontend.onrender.com'], // 自分のフロントエンドURLに後で変更
   optionsSuccessStatus: 200
 };
 
