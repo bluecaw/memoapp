@@ -1,6 +1,6 @@
 const express = require('express');
 require('dotenv').config(); // .envファイルを読み込む
-const sqlite3 = require('sqlite3').verbose();
+const db = require('./database'); // PostgreSQL接続プールをインポート
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
@@ -23,14 +23,6 @@ const corsOptions = {
 // Middleware
 app.use(cors(corsOptions));
 app.use(express.json());
-
-// Database connection
-const db = new sqlite3.Database('./database.db', (err) => {
-    if (err) {
-        console.error(err.message);
-    }
-    console.log('Connected to the SQLite database.');
-});
 
 // 認証ミドルウェア
 const authenticateToken = (req, res, next) => {
@@ -56,24 +48,26 @@ app.post('/api/register', async (req, res) => {
 
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
-        const sql = 'INSERT INTO users (username, password) VALUES (?, ?)';
-        db.run(sql, [username, hashedPassword], function(err) {
-            if (err) {
-                return res.status(400).json({ error: 'Username already exists' });
-            }
-            res.status(201).json({ id: this.lastID, username });
-        });
-    } catch {
-        res.status(500).send();
+        const sql = 'INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id, username';
+        const { rows } = await db.query(sql, [username, hashedPassword]);
+        res.status(201).json(rows[0]);
+    } catch (err) {
+        if (err.code === '23505') { // unique_violation
+            return res.status(400).json({ error: 'Username already exists' });
+        }
+        console.error(err);
+        res.status(500).send({ error: 'Internal server error' });
     }
 });
 
 // ログイン
-app.post('/api/login', (req, res) => {
+app.post('/api/login', async (req, res) => {
     const { username, password } = req.body;
-    const sql = 'SELECT * FROM users WHERE username = ?';
-    db.get(sql, [username], async (err, user) => {
-        if (err || !user) {
+    const sql = 'SELECT * FROM users WHERE username = $1';
+    try {
+        const { rows } = await db.query(sql, [username]);
+        const user = rows[0];
+        if (!user) {
             return res.status(400).json({ error: 'Invalid credentials' });
         }
         if (await bcrypt.compare(password, user.password)) {
@@ -82,67 +76,80 @@ app.post('/api/login', (req, res) => {
         } else {
             res.status(400).json({ error: 'Invalid credentials' });
         }
-    });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({ error: 'Internal server error' });
+    }
 });
 
 // メモの取得 (認証が必要)
-app.get('/api/memos', authenticateToken, (req, res) => {
-    const sql = 'SELECT * FROM memos WHERE userId = ? ORDER BY updatedAt DESC';
-    db.all(sql, [req.user.id], (err, rows) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
+app.get('/api/memos', authenticateToken, async (req, res) => {
+    const sql = 'SELECT * FROM memos WHERE "userId" = $1 ORDER BY "updatedAt" DESC';
+    try {
+        const { rows } = await db.query(sql, [req.user.id]);
         res.json(rows);
-    });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
 });
 
 // メモの作成 (認証が必要)
-app.post('/api/memos', authenticateToken, (req, res) => {
+app.post('/api/memos', authenticateToken, async (req, res) => {
     const { content } = req.body;
     if (!content) {
         return res.status(400).json({ error: 'Content is required' });
     }
-    const sql = 'INSERT INTO memos (content, userId) VALUES (?, ?)';
-    db.run(sql, [content, req.user.id], function(err) {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        res.status(201).json({ id: this.lastID, content, userId: req.user.id });
-    });
+    const sql = 'INSERT INTO memos (content, "userId") VALUES ($1, $2) RETURNING *';
+    try {
+        const { rows } = await db.query(sql, [content, req.user.id]);
+        res.status(201).json(rows[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
 });
 
 // メモの更新 (認証が必要)
-app.put('/api/memos/:id', authenticateToken, (req, res) => {
+app.put('/api/memos/:id', authenticateToken, async (req, res) => {
     const { content } = req.body;
     const { id } = req.params;
-    const sql = 'UPDATE memos SET content = ?, updatedAt = CURRENT_TIMESTAMP WHERE id = ? AND userId = ?';
-    db.run(sql, [content, id, req.user.id], function(err) {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        if (this.changes === 0) {
+    const sql = 'UPDATE memos SET content = $1, "updatedAt" = CURRENT_TIMESTAMP WHERE id = $2 AND "userId" = $3 RETURNING *';
+    try {
+        const { rows } = await db.query(sql, [content, id, req.user.id]);
+        if (rows.length === 0) {
             return res.status(404).json({ error: 'Memo not found or user not authorized' });
         }
-        res.json({ message: 'Memo updated successfully' });
-    });
+        res.json(rows[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
 });
 
 // メモの削除 (認証が必要)
-app.delete('/api/memos/:id', authenticateToken, (req, res) => {
+app.delete('/api/memos/:id', authenticateToken, async (req, res) => {
     const { id } = req.params;
-    const sql = 'DELETE FROM memos WHERE id = ? AND userId = ?';
-    db.run(sql, [id, req.user.id], function(err) {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        if (this.changes === 0) {
+    const sql = 'DELETE FROM memos WHERE id = $1 AND "userId" = $2';
+    try {
+        const result = await db.query(sql, [id, req.user.id]);
+        if (result.rowCount === 0) {
             return res.status(404).json({ error: 'Memo not found or user not authorized' });
         }
         res.status(204).send();
-    });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
 });
-
 
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
+});
+
+// Graceful shutdown
+process.on('SIGINT', async () => {
+    await db.pool.end();
+    console.log('Database connection pool closed.');
+    process.exit(0);
 });

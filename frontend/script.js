@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const notification = document.getElementById('notification');
     const logoutBtn = document.getElementById('logout-btn');
 
-    const API_URL = 'http://localhost:3000/api';
+    // API_BASE_URLはconfig.jsで定義
     const token = localStorage.getItem('token');
 
     // --- 認証 ---
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- API呼び出し ---
     const fetchMemos = async () => {
         try {
-            const res = await fetch(`${API_URL}/memos`, { headers: authHeader });
+            const res = await fetch(`${API_BASE_URL}/memos`, { headers: authHeader });
             if (res.status === 401 || res.status === 403) {
                 localStorage.removeItem('token');
                 window.location.href = 'login.html';
@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const content = sanitizeHTML(memoContent.value);
         const id = memoId.value;
         
-        const url = id ? `${API_URL}/memos/${id}` : `${API_URL}/memos`;
+        const url = id ? `${API_BASE_URL}/memos/${id}` : `${API_BASE_URL}/memos`;
         const method = id ? 'PUT' : 'POST';
 
         try {
@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const deleteMemo = async (id) => {
         if (confirm('本当にこのメモを削除しますか？')) {
             try {
-                const res = await fetch(`${API_URL}/memos/${id}`, {
+                const res = await fetch(`${API_BASE_URL}/memos/${id}`, {
                     method: 'DELETE',
                     headers: authHeader,
                 });

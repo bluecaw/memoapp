@@ -1,43 +1,53 @@
-const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('./database.db', (err) => {
-    if (err) {
-        console.error(err.message);
-    }
-    console.log('Connected to the SQLite database.');
+const { Pool } = require('pg');
+require('dotenv').config();
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
-db.serialize(() => {
+const createTables = async () => {
+  const client = await pool.connect();
+  try {
     // ユーザーテーブル
-    db.run(`CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
         username TEXT NOT NULL UNIQUE,
         password TEXT NOT NULL
-    )`, (err) => {
-        if (err) {
-            return console.error(err.message);
-        }
-        console.log("Users table created.");
-    });
+      )
+    `);
+    console.log("Users table created or already exists.");
 
     // メモテーブル
-    db.run(`CREATE TABLE IF NOT EXISTS memos (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS memos (
+        id SERIAL PRIMARY KEY,
         content TEXT NOT NULL,
-        userId INTEGER NOT NULL,
-        createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (userId) REFERENCES users (id)
-    )`, (err) => {
-        if (err) {
-            return console.error(err.message);
-        }
-        console.log("Memos table created.");
-    });
+        "userId" INTEGER NOT NULL,
+        "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY ("userId") REFERENCES users (id) ON DELETE CASCADE
+      )
+    `);
+    console.log("Memos table created or already exists.");
+
+  } catch (err) {
+    console.error('Error creating tables:', err.stack);
+  } finally {
+    client.release();
+  }
+};
+
+// サーバー起動時にテーブル作成を実行
+createTables().catch(err => {
+    console.error('Failed to initialize database:', err.stack);
+    process.exit(1);
 });
 
-db.close((err) => {
-    if (err) {
-        console.error(err.message);
-    }
-    console.log('Close the database connection.');
-});
+module.exports = {
+  query: (text, params) => pool.query(text, params),
+  pool,
+};
