@@ -1,7 +1,33 @@
 services:
+  # バックエンドサービス (Node.js)
+  - type: web
+    name: memoapp-backend
+    env: node
+    plan: free # or standard, etc.
+    rootDir: ./backend
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # 他に必要な環境変数があればここに追加 (例: DATABASE_URL)
+
+  # フロントエンドサービス (静的サイト)
   - type: static_site
-    name: memoapp-frontend # あなたのRender上のStatic Siteの名前に合わせてください
+    name: memoapp-frontend
+    plan: free
+    rootDir: ./frontend
+    # buildCommand: (もしビルドステップが必要なら)
     headers:
       - path: "/*"
         name: "Content-Security-Policy"
-        value: "default-src 'self'; connect-src 'self' https://memoapp-backend.onrender.com;"
+        value: "default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://memoapp-backend.onrender.com; img-src 'self' data:; object-src 'none'; frame-ancestors 'none';"
+      - path: "/*"
+        name: "X-Content-Type-Options"
+        value: "nosniff"
+      - path: "/*"
+        name: "X-Frame-Options"
+        value: "DENY"
+      - path: "/*"
+        name: "X-XSS-Protection"
+        value: "1; mode=block"
