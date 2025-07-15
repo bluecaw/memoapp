@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const memoList = document.getElementById('memo-list');
     const notification = document.getElementById('notification');
     const logoutBtn = document.getElementById('logout-btn');
+    const deleteAccountBtn = document.getElementById('delete-account-btn');
 
     // API_BASE_URLはconfig.jsで定義
     const token = localStorage.getItem('token');
@@ -134,6 +135,31 @@ document.addEventListener('DOMContentLoaded', () => {
     logoutBtn.addEventListener('click', () => {
         localStorage.removeItem('token');
         window.location.href = 'login.html';
+    });
+
+    deleteAccountBtn.addEventListener('click', async () => {
+        if (!confirm('本当にアカウントを削除しますか？この操作は元に戻せません。')) {
+            return;
+        }
+    
+        try {
+            const res = await fetch(`${API_BASE_URL}/users/me`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` },
+            });
+    
+            if (!res.ok) {
+                throw new Error('アカウントの削除に失敗しました。');
+            }
+    
+            // 削除が成功したらトークンを削除してログインページにリダイレクト
+            localStorage.removeItem('token');
+            alert('アカウントが正常に削除されました。');
+            window.location.href = 'login.html';
+    
+        } catch (err) {
+            showNotification(err.message, true);
+        }
     });
 
     // --- 初期化 ---

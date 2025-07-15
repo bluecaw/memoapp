@@ -246,3 +246,27 @@ h1 {
     visibility: visible;
     transform: translate(-50%, -10px);
 }
+
+.danger-btn {
+    background-color: var(--delete-color);
+    color: white;
+}
+
+.danger-btn:hover {
+    background-color: #c82333; /* 少し暗い赤 */
+}
+
+/* header-container内のボタンの配置を調整 */
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: var(--header-color);
+    color: white;
+}
+
+.header-container div {
+    display: flex;
+    gap: 1rem;
+}

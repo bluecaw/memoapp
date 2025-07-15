@@ -143,6 +143,38 @@ app.delete('/api/memos/:id', authenticateToken, async (req, res) => {
     }
 });
 
+// ユーザーアカウントの削除 (認証が必要)
+app.delete('/api/users/me', authenticateToken, async (req, res) => {
+    const userId = req.user.id;
+    const client = await db.pool.connect(); // プールからクライアントを取得
+
+    try {
+        await client.query('BEGIN'); // トランザクション開始
+
+        // 1. ユーザーに関連するすべてのメモを削除
+        await client.query('DELETE FROM memos WHERE "userId" = $1', [userId]);
+
+        // 2. ユーザー自身を削除
+        const deleteUserResult = await client.query('DELETE FROM users WHERE id = $1', [userId]);
+
+        if (deleteUserResult.rowCount === 0) {
+            // このケースは通常発生しないはずだが、念のため
+            throw new Error('User not found.');
+        }
+
+        await client.query('COMMIT'); // トランザクションをコミット
+        res.status(204).send(); // 成功（No Content）
+
+    } catch (err) {
+        await client.query('ROLLBACK'); // エラーが発生したらロールバック
+        console.error(err);
+        res.status(500).json({ error: 'Failed to delete user account.' });
+    } finally {
+        client.release(); // クライアントをプールに返却
+    }
+});
+
+
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
 });
