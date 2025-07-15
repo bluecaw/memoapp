@@ -20,14 +20,39 @@ body {
     background-color: var(--background-color);
     color: var(--text-color);
     margin: 0;
-    padding: 2rem;
+    /* bodyのpaddingを削除し、ヘッダーが全幅になるようにする */
 }
 
 h1 {
-    text-align: center;
+    /* text-align: center; を削除 */
     color: var(--header-color);
     font-weight: 700;
     letter-spacing: 2px;
+}
+
+/* Header Container のスタイルを更新 */
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: var(--header-color);
+    color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 2rem; /* フォームとの間隔を確保 */
+}
+
+.header-container h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: white; /* 文字色を白に */
+}
+
+.header-container div {
+    display: flex;
+    gap: 1rem;
 }
 
 #memo-form {
